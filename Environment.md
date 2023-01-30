@@ -189,24 +189,6 @@ pnpm install pinia
 
 ### 4.2 配置Pinia
 
-创建`store`文件夹，并在文件夹中创建`index.ts`文件
-
-```ts
-
-import { createPinia } from 'pinia'
-
-const store = createStore({
-  state: {
-    count: 0
-  },
-  mutations: {
-    increment(state) {
-      state.count++
-    }
-  }
-})
-```
-
 在`main.ts`中引入`pinia`并挂载
 
 ```ts
@@ -217,8 +199,35 @@ const pinia = createPinia()
 app.use(pinia)
 ```
 
+创建`store`文件夹，并在文件夹中创建`index.ts`文件
+
+```ts
+import type { App } from 'vue'
+import { defineStore } from 'pinia'
+const mainStore = defineStore('main', {
+  state: () => ({
+    count: 0,
+    name: 'Odin',
+  }),
+  getters: {
+    doubleCount: (state) => state.count * 2,
+  },
+  actions: {
+    increment() {
+      this.count++
+    },
+    decrement() {
+      this.count--
+    }
+  }
+})
+
+export default mainStore
+
+```
+
 在组件或者ts中使用Pinia：
-```html
+```vue
 <template>
   <div class="counter">
     <h3>Counter</h3>
@@ -229,6 +238,15 @@ app.use(pinia)
     <el-button type="primary" @click="decrease">Decrease</el-button>
   </div>
 </template>
+<script lang="ts" setup>
+import { computed, ref } from 'vue'
+import mainStore from '~/store'
+const store = mainStore()
+
+const cnt = computed(() => store.count)
+const increase = () => store.increment()
+const decrease = () => store.decrement()
+</script>
 ```
 
 ```ts
