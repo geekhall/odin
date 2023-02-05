@@ -1,5 +1,5 @@
-# Zeus
+# Odin
 
-Zeus is a starter template for Vue 3, TypeScript and Vite.
+Odin is a starter template for Vue 3, TypeScript and Vite.
 integrated with Element Plus, TailwindCSS, Vue Router, Pinia and Axios.
 

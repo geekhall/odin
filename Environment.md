@@ -278,7 +278,7 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-export function request(config: AxiosRequestConfig) {
+export default function request(config: AxiosRequestConfig) {
 
   // 1. 创建 axios 实例
   const instance = axios.create({
@@ -374,7 +374,7 @@ export function request(config: AxiosRequestConfig) {
 
 ```ts
 server: {
-    port: 3000,
+    port: 4000,
     open: true, // 自动打开浏览器
     hmr: true,  // 热模块替换
     base: './', // 生产环境下的公共路径
@@ -393,20 +393,24 @@ server: {
 在组件或者ts中使用Axios：
 
 ```ts
-import axios from "axios";
+export const getHeraData = (api_url: string) => {
+  return request({
+    url: api_url,
+    method: MethodType.GET
+  } as AxiosRequestConfig)
+}
 
-const getProducts = async () => {
-  const result = await axios({
-    method: "GET",
-    url: "/api/environment/all",
-  })
-    .then((res: any) => {
-      envs.value = JSON.parse(JSON.stringify(res.data));
+// 获取表格数据
+const getData = () => {
+  getHeraData('/teacher/all')
+    .then((res) => {
+      tableData.value = res.data.items
+      pageTotal.value = res.data.pageTotal || 50
     })
-    .catch((err: any) => {
-      console.log(err.message);
-    });
-};
+    .catch((err) => {
+      ElMessage.error(err)
+    })
+}
 ```
 
 ## 6. 安装及配置vue-i18n，添加国际化支持
@@ -886,8 +890,230 @@ export default defineConfig({
   </div>
 </template>
 
+## 14. 安装使用vite-svg-loader
+
+### 14.1 安装
+
+```bash
+pnpm i -D vite-svg-loader
+```
+
+### 14.2 配置
+
+```ts
+// vite.config.ts
+import svgLoader from 'vite-svg-loader'
+export default defineConfig({
+  plugins: [
+    // ...
+    svgLoader(),
+  ],
+});
+```
+
+现在就可以以组件的形式导入svg文件，url或者raw-data了，
+这里编写一个icon组件统一管理svg图标
+
+```vue
+<template>
+  <component :is="icon" class="fill-current" />
+</template>
+
+<script lang="ts" setup>
+import { ref } from 'vue'
+import { defineAsyncComponent } from 'vue'
+
+const props = defineProps({
+  name: {
+    type: String,
+    required: true
+  }
+})
+
+const icon = defineAsyncComponent(() => import(`~/assets/svg/${props.name}.svg`))
+</script>
+
+<style lang="less" scoped>
+</style>
 
 ```
+### 14.3 使用
+
+```vue
+<icon name="ep-home-1"></icon>
+<icon name="ep-home-1-door-1"></icon>
+```
+
+
+## 15. 集成wangEditor富文本编辑器
+
+### 15.1 安装
+
+```bash
+pnpm i wangeditor
+```
+
+### 15.2 使用
+```vue
+<template>
+  <div class="content-container">
+    <h1>Editor</h1>
+    <hr />
+    <div class="plugins-tips">
+      <p>使用 <a href="https://www.wangeditor.com/" target="_blank">wangeditor</a> 富文本编辑器</p>
+    </div>
+    <div class="editor-container">
+      <div class="editor mgb20" ref="editor"></div>
+      <div class="editor-content">
+        <el-input type="textarea" v-model="editorContent.html" placeholder="请输入内容" />
+        <el-button class="btn" type="primary" @click="syncHTML">同步</el-button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import wangEditor from 'wangeditor'
+import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
+
+const editor = ref(null as any)
+const editorContent = reactive({
+  html: '',
+  text: ''
+})
+
+let editorInstance: any = null
+
+onMounted(() => {
+  editorInstance = new wangEditor(editor.value)
+  editorInstance.config.zIndex = 1
+  editorInstance.create()
+  editorInstance.txt.html(editorContent.html)
+  editorInstance.onchange = () => {
+    editorContent.html = editorInstance.txt.html()
+    editorContent.text = editorInstance.txt.text()
+  }
+})
+onBeforeUnmount(() => {
+  editorInstance.destroy()
+  editorInstance = null
+})
+
+const syncHTML = () => {
+  editorContent.html = editorInstance.txt.html()
+  console.log(editorContent.html)
+}
+</script>
+
+<style lang="less" scoped>
+.editor-container {
+  display: flex;
+  .editor {
+    flex: 1;
+  }
+  .editor-content {
+    flex: 1;
+    margin-left: 20px;
+  }
+}
+</style>
+
+```
+
+## 16. 集成md-editor-v3 版本的Markdown编辑器
+
+### 16.1 安装
+
+```bash
+pnpm i md-editor-v3
+```
+
+## 16.2 使用
+
+```vue
+<template>
+  <md-editor class="mgb20" v-model="text" @on-upload-img="onUploadImg" />
+</template>
+
+<script setup lang="ts" name="md">
+import { ref } from 'vue'
+import MdEditor from 'md-editor-v3'
+import 'md-editor-v3/lib/style.css'
+
+const text = ref('Hello Editor!')
+const onUploadImg = (files: any) => {
+  console.log(files)
+}
+</script>
+
+```
+
+## 17. 添加Excel导入导出功能
+
+```bash
+pnpm i xlsx
+```
+
+## 18. 添加vue-cropperjs图片裁剪功能
+
+```bash
+pnpm i --save-dev @types/vue-cropperjs
+```
+
+## 19 添加chart.js图表功能
+
+```bash
+pnpm i vue-chartjs chart.js
+```
+
+### 19.1 使用
+
+```vue
+<template>
+  <div class="content-container">
+    <h1>Charts</h1>
+    <Bar :data="data" :options="options" />
+    <hr />
+    <Bar :data="bar_data" :options="bar_options" />
+    <hr />
+    <Bubble :data="bubble_data" :options="bubble_options" />
+  </div>
+</template>
+
+<script lang="ts" setup>
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale
+} from 'chart.js'
+import { Bar } from 'vue-chartjs'
+import { reactive } from 'vue'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+
+const data = {
+  loaded: false,
+  labels: ['January', 'February', 'March'],
+  datasets: [
+    {
+      label: 'Data One',
+      backgroundColor: '#345678',
+      data: [40, 20, 12]
+    }
+  ]
+}
+const options = {
+  responsive: true
+}
+</script>
+
+```
+
+
 ### 启动环境
 
 ```bash

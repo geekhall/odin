@@ -1,32 +1,31 @@
 <template>
-  <h1>Axios Sample Page</h1>
-  <el-button class="btn" type="primary" @click="clearProducts">清空数据</el-button>
-  <el-button class="btn" type="primary" @click="getProducts">获取数据</el-button>
-  <hr />
-  <div class="container">
-    <div class="content">
-      <el-table :data="envs" stripe style="width: 100%">
-        <el-table-column prop="id" label="ID" width="80"> </el-table-column>
-        <el-table-column prop="name" label="环境名称" width="120"> </el-table-column>
-        <el-table-column prop="description" label="描述" width="150"> </el-table-column>
-        <el-table-column prop="dbType" label="数据库类型" width="120"> </el-table-column>
-        <el-table-column prop="dbHost" label="IP" width="120"> </el-table-column>
-        <el-table-column prop="dbPort" label="端口" width="80"> </el-table-column>
-        <el-table-column prop="dbServName" label="实例名" width="120"> </el-table-column>
-        <el-table-column prop="dbName" label="库名" width="120"> </el-table-column>
-        <el-table-column prop="dbUser" label="用户名" width="120"> </el-table-column>
-        <el-table-column prop="comment" label="备注"> </el-table-column>
-      </el-table>
+  <div class="content-container">
+    <h1>Axios Sample Page</h1>
+    <el-button class="btn" type="primary" @click="clearProducts">清空数据</el-button>
+    <el-button class="btn" type="primary" @click="getProducts">获取数据</el-button>
+    <hr />
+    <div class="data-container">
+      <div class="content">
+        <el-table :data="envs" stripe>
+          <el-table-column prop="id" label="ID" width="80"> </el-table-column>
+          <el-table-column prop="name" label="环境名称" width="120"> </el-table-column>
+          <el-table-column prop="description" label="描述" width="150"> </el-table-column>
+          <el-table-column prop="dbType" label="数据库类型" width="120"> </el-table-column>
+          <el-table-column prop="dbHost" label="IP" width="120"> </el-table-column>
+          <el-table-column prop="dbPort" label="端口" width="80"> </el-table-column>
+          <el-table-column prop="dbServName" label="实例名" width="120"> </el-table-column>
+          <el-table-column prop="dbName" label="库名" width="120"> </el-table-column>
+          <el-table-column prop="dbUser" label="用户名" width="120"> </el-table-column>
+          <el-table-column prop="comment" label="备注"> </el-table-column>
+        </el-table>
+      </div>
     </div>
   </div>
-
-  <hr />
 </template>
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import axios from 'axios'
-import { useStore } from 'vuex'
 
 interface ILocalEnvironment {
   id: number
@@ -73,7 +72,6 @@ const getProducts = async () => {
       console.log(err.message)
     })
 }
-const store = useStore()
 const random_color = () => {
   return title_color[Math.floor(Math.random() * title_color.length)]
 }
@@ -113,11 +111,13 @@ onMounted(() => {
   width: 100%;
   display: block;
 }
-.container {
+.data-container {
   align-content: center;
   display: flex;
   flex-direction: row;
   justify-content: center;
+  margin: 0 auto;
+  padding: 0;
 }
 .content {
   margin: 0 auto;

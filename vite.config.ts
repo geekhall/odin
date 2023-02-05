@@ -17,9 +17,13 @@ import IconsResolver from 'unplugin-icons/resolver'
 // import styleImport from 'vite-plugin-style-import'
 import UnoCSS from 'unocss/vite'
 import { presetIcons } from 'unocss'
+import epIcons from '@iconify-json/ep'
+import svgLoader from 'vite-svg-loader'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { dir } from 'console'
+
+
 // const path_resolve = (dir: string) => path.join(__dirname, dir)
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -62,6 +66,7 @@ export default defineConfig({
         }
       ],
     }),
+    svgLoader(),
     // styleImport({
     //   libs: [
     //     {
@@ -116,7 +121,7 @@ export default defineConfig({
     }),
   ],
   server: {
-    port: 3000,
+    port: 4000,
     // open: true, // 自动打开浏览器
     hmr: true,  // 热模块替换
     base: './', // 生产环境下的公共路径

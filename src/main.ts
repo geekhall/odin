@@ -1,65 +1,29 @@
-import { createApp } from 'vue'
-import Vue from 'vue'
-
-/** 重置样式 这里引入自定义的重置样式也可 */
-// import '@unocss/reset/tailwind.css' // 这里放开会导致式样错乱，暂时不知道为什么
-
-// 引入normalize.css
-import 'normalize.css/normalize.css'
-
-/**
- *  项目内的样式，
- *  注意：最好放在重置样式后，uno.css前
- */
-import './style.css'
-import './tailwind.css'
-
-// 引入uno.css
-import 'uno.css'
-
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // import section
-// 引入的各种第三方模块，如Element Plus、Vue Router、Pinia等
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-
-// 引入路由
-import router, { setupRouter } from './router'
-
-// 全局引入Element Plus（本工程使用按需引入，这里注释掉）
-// import ElementPlus from 'element-plus'
-// import 'element-plus/dist/index.css'
-
-// 引入Pinia
-import store from './store'
+import { createApp } from 'vue'
+import Vue from 'vue'
+import 'normalize.css/normalize.css'  // 重置样式 这里引入自定义的重置样式也可
+import './style.css'                  // 项目内的样式，最好放在重置样式后，uno.css前
+import './tailwind.css'               // TailwindCSS
+import 'uno.css'                      // UnoCSS
+import router, { setupRouter } from './router'  // 引入路由
+import store from './store'           // 引入Pinia
 import { createPinia } from 'pinia'
-
-
-// import App from './App.vue'
-
-// 引入vue-i18n，用于国际化
-import { createI18n } from 'vue-i18n'
+import { createI18n } from 'vue-i18n' // 引入vue-i18n，用于国际化
 import messages from "@intlify/unplugin-vue-i18n/messages";
-
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// createApp
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import { usePermissionStore } from '~/store/permission'
+import 'element-plus/dist/index.css'
+import '~/assets/css/icon.css'
 import App from './App.vue'
-
 const app = createApp(App)
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // setting
 // 各种第三方模块的设置，如Element Plus、Vue Router、Vuex等
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-
-
-// 设置Vue-router路由
-setupRouter(app)
-
-// 设置Element Plus（本工程使用按需引入，这里注释掉）
-// app.use(ElementPlus)
-
+setupRouter(app)  // 设置Vue-router路由
 // 设置Pinia
 const pinia = createPinia()
 app.use(pinia)
@@ -75,6 +39,21 @@ const i18n = createI18n({
 });
 app.use(i18n)
 
+//从 @element-plus/icons-vue 中导入所有图标并进行全局注册。
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+
+// 自定义权限指令
+const permission = usePermissionStore();
+app.directive('permission', {
+  mounted(el, binding) {
+    if (!permission.key.includes(String(binding.value))) {
+      // el.parentNode.removeChild(el);
+      el['hidden'] = true;
+    }
+  },
+})
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // mount
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
